@@ -9,17 +9,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, email, phone, city } = body
 
+    console.log('Received lead submission:', { name, email, phone, city })
+
     // Validate required fields
     if (!name || !email || !phone || !city) {
+      console.error('Missing required fields:', { name: !!name, email: !!email, phone: !!phone, city: !!city })
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields. Please fill all fields.' },
         { status: 400 }
       )
     }
 
     // Save lead to Supabase
+    console.log('Connecting to Supabase...')
     const supabase = await createClient()
-    const { error: dbError } = await supabase
+    
+    console.log('Inserting lead into database...')
+    const { data: insertedData, error: dbError } = await supabase
       .from('leads')
       .insert([{
         name,
@@ -28,14 +34,21 @@ export async function POST(request: NextRequest) {
         city,
         source: 'checklist_download'
       }])
+      .select()
 
     if (dbError) {
       console.error('Database error:', dbError)
       return NextResponse.json(
-        { error: 'Failed to save lead' },
+        { 
+          error: 'Failed to save lead to database', 
+          details: dbError.message,
+          hint: dbError.hint 
+        },
         { status: 500 }
       )
     }
+
+    console.log('Lead saved successfully:', insertedData)
 
     // Send to Make.com webhook (if configured)
     if (process.env.MAKE_WEBHOOK_URL) {
