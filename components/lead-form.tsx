@@ -11,7 +11,7 @@ import { Download } from "lucide-react"
 const leadSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile number"),
-  email: z.string().email("Enter valid email").optional().or(z.literal("")),
+  email: z.string().email("Enter valid email"),
   city: z.string().min(2, "City is required"),
 })
 
@@ -41,6 +41,7 @@ export function LeadForm() {
       const result = await response.json()
 
       if (!response.ok) {
+        console.error('API Error:', result)
         throw new Error(result.error || 'Failed to send checklist')
       }
 
@@ -48,11 +49,16 @@ export function LeadForm() {
       reset()
       
       // Also trigger browser download as backup
-      window.open('/documents/approval-checklist.pdf', '_blank')
+      try {
+        window.open('/documents/approval-checklist.pdf', '_blank')
+      } catch (e) {
+        console.log('PDF download not available')
+      }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error)
-      alert('Something went wrong. Please try again or contact us directly.')
+      const errorMessage = error.message || 'Something went wrong. Please try again or contact us directly.'
+      alert(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -110,7 +116,7 @@ export function LeadForm() {
       <div>
         <Input
           {...register("email")}
-          placeholder="Email (Optional)"
+          placeholder="Email *"
           type="email"
           className={errors.email ? "border-red-500" : ""}
         />

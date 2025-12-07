@@ -63,15 +63,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email with PDF attachment (only if Resend is configured)
-    if (!resend) {
-      console.log('Resend not configured, skipping email')
-      return NextResponse.json({
-        success: true,
-        message: 'Lead saved successfully (email not configured)',
-      })
-    }
+    let emailSent = false
+    let emailId = null
 
-    const { data, error: emailError } = await resend.emails.send({
+    if (resend) {
+      try {
+        const { data, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
       to: email,
       subject: 'Your Construction Approval Checklist - Gharlo Support',
@@ -164,32 +161,38 @@ export async function POST(request: NextRequest) {
         </html>
       `,
       // Attach PDF - You'll need to add the actual PDF file
-      attachments: [
-        {
-          filename: 'construction-approval-checklist.pdf',
-          path: `${process.env.NEXT_PUBLIC_SITE_URL}/documents/approval-checklist.pdf`,
-        },
-      ],
-    })
+          attachments: [
+            {
+              filename: 'construction-approval-checklist.pdf',
+              path: `${process.env.NEXT_PUBLIC_SITE_URL}/documents/approval-checklist.pdf`,
+            },
+          ],
+        })
 
-    if (emailError) {
-      console.error('Email error:', emailError)
-      return NextResponse.json(
-        { error: 'Failed to send email', details: emailError },
-        { status: 500 }
-      )
+        if (emailError) {
+          console.error('Email error:', emailError)
+        } else {
+          emailSent = true
+          emailId = data?.id
+        }
+      } catch (emailException: any) {
+        console.error('Email exception:', emailException)
+        // Don't fail the request if email fails
+      }
     }
 
+    // Return success even if email failed (lead is saved)
     return NextResponse.json({
       success: true,
-      message: 'Email sent successfully',
-      emailId: data?.id
+      message: emailSent ? 'Lead saved and email sent' : 'Lead saved successfully',
+      emailSent,
+      emailId
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Server error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     )
   }
