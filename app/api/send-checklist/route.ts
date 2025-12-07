@@ -37,6 +37,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Send to Make.com webhook (if configured)
+    if (process.env.MAKE_WEBHOOK_URL) {
+      try {
+        await fetch(process.env.MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            city,
+            source: 'checklist_download',
+            timestamp: new Date().toISOString(),
+            platform: 'gharlo_support'
+          })
+        })
+        console.log('Lead sent to Make.com')
+      } catch (makeError) {
+        console.error('Make.com webhook error:', makeError)
+        // Don't fail the request if Make.com fails
+      }
+    }
+
     // Send email with PDF attachment (only if Resend is configured)
     if (!resend) {
       console.log('Resend not configured, skipping email')
