@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +37,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send email with PDF attachment
+    // Send email with PDF attachment (only if Resend is configured)
+    if (!resend) {
+      console.log('Resend not configured, skipping email')
+      return NextResponse.json({
+        success: true,
+        message: 'Lead saved successfully (email not configured)',
+      })
+    }
+
     const { data, error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
       to: email,
