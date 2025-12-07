@@ -48,12 +48,9 @@ export function LeadForm() {
       setSubmitted(true)
       reset()
       
-      // Also trigger browser download as backup
-      try {
-        window.open('/documents/approval-checklist.pdf', '_blank')
-      } catch (e) {
-        console.log('PDF download not available')
-      }
+      // Only try to download PDF if it exists
+      // You can enable this once you create the PDF file
+      // window.open('/documents/approval-checklist.pdf', '_blank')
       
     } catch (error: any) {
       console.error('Error submitting form:', error)
@@ -71,17 +68,17 @@ export function LeadForm() {
           <Download className="w-8 h-8 text-emerald-600" />
         </div>
         <h3 className="text-xl font-bold text-slate-900 mb-2">
-          Check Your Email! 📧
+          Thank You! 🎉
         </h3>
         <p className="text-slate-600 mb-4">
-          We've sent the Construction Approval Checklist PDF to your email.
+          Your request has been received successfully!
           <br />
           <span className="text-sm text-slate-500">
-            (Also check your spam folder)
+            Our team will contact you shortly via WhatsApp or phone.
           </span>
         </p>
         <Button onClick={() => setSubmitted(false)} variant="outline">
-          Send to Another Email
+          Submit Another Request
         </Button>
       </div>
     )
