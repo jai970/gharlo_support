@@ -139,7 +139,7 @@ export function LeadForm() {
         size="lg"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Sending..." : "Download Free Checklist"}
+        {isSubmitting ? "Submitting..." : "Get Free Checklist"}
         <Download className="w-5 h-5" />
       </Button>
 
