@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
               </div>
               
               <p style="color: #4b5563; font-size: 16px;">
-                <strong>Note:</strong> The PDF checklist is attached to this email. If you don't see it, please check your spam folder.
+                <strong>Next Steps:</strong> Our team will contact you shortly via WhatsApp or phone to provide the complete checklist and answer any questions.
               </p>
               
               <div style="text-align: center; margin: 30px 0;">
@@ -173,13 +173,13 @@ export async function POST(request: NextRequest) {
           </body>
         </html>
       `,
-      // Attach PDF - You'll need to add the actual PDF file
-          attachments: [
-            {
-              filename: 'construction-approval-checklist.pdf',
-              path: `${process.env.NEXT_PUBLIC_SITE_URL}/documents/approval-checklist.pdf`,
-            },
-          ],
+      // PDF attachment removed - add it back when you create the PDF file
+      // attachments: [
+      //   {
+      //     filename: 'construction-approval-checklist.pdf',
+      //     path: `${process.env.NEXT_PUBLIC_SITE_URL}/documents/approval-checklist.pdf`,
+      //   },
+      // ],
         })
 
         if (emailError) {
