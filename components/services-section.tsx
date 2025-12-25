@@ -5,7 +5,8 @@ import { FileCheck, Building2, Phone, Calculator } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 // Force rebuild: Pricing update deployment - ₹5,000 Full Approval Filing service
-// Cache clear timestamp: 2025-12-25T00:00:00Z
+// Cache clear timestamp: 2025-12-25T12:00:00Z
+// Deployment trigger: Fresh build required
 export function ServicesSection() {
   const services = [
     {
