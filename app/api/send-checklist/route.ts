@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createServerClient } from '@supabase/supabase-js'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+
+// Create admin client with service role key for API operations
+function createAdminClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,9 +34,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Save lead to Supabase
-    console.log('Connecting to Supabase...')
-    const supabase = await createClient()
+    // Save lead to Supabase using admin client
+    console.log('Connecting to Supabase with admin privileges...')
+    const supabase = createAdminClient()
     
     console.log('Inserting lead into database...')
     const { data: insertedData, error: dbError } = await supabase
