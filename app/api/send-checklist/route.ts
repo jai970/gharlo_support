@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
 
     // Save lead to Supabase using admin client
     console.log('Connecting to Supabase with admin privileges...')
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('Service Role Key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+    
     const supabase = createAdminClient()
     
     console.log('Inserting lead into database...')
@@ -52,10 +55,14 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error('Database error:', dbError)
+      console.error('Error code:', dbError.code)
+      console.error('Error message:', dbError.message)
+      console.error('Error details:', JSON.stringify(dbError, null, 2))
       return NextResponse.json(
         { 
           error: 'Failed to save lead to database', 
           details: dbError.message,
+          code: dbError.code,
           hint: dbError.hint 
         },
         { status: 500 }
